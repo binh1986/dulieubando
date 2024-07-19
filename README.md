@@ -65,8 +65,8 @@
                 });
         };
 
-        // URL of your KMZ file on GitHub
-        const kmzFileUrl = 'https://github.com/binh1986/dulieubando/raw/main/parcel_sel2.kmz';
+        // URL of your KMZ file on OneDrive
+        const kmzFileUrl = 'https://onedrive.live.com/download?cid=33E2633D6589CBBC&id=33E2633D6589CBBC%21148755';
         loadKMZFromURL(kmzFileUrl);
 
         document.getElementById('uploadForm').addEventListener('submit', function(event) {
