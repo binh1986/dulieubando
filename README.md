@@ -50,8 +50,8 @@
                 });
         };
 
-        // Replace 'YOUR_KMZ_FILE_URL' with the URL of your KMZ file
-        const kmzFileUrl = 'https://github.com/binh1986/dulieubando/blob/main/parcel_sel.kmz';
+        // Replace 'YOUR_KMZ_FILE_URL' with the URL of your KMZ file on GitHub
+        const kmzFileUrl = 'https://github.com/binh1986/dulieubando/raw/main/parcel_sel.kmz';
         loadKMZFromURL(kmzFileUrl);
 
         document.getElementById('uploadForm').addEventListener('submit', function(event) {
