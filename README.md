@@ -36,21 +36,35 @@
 
         const loadKMZFromURL = (url) => {
             fetch(url)
-                .then(response => response.arrayBuffer())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.arrayBuffer();
+                })
                 .then(data => {
                     JSZip.loadAsync(data).then(zip => {
-                        zip.file(/\.kml$/i)[0].async("string").then(kmlContent => {
-                            const parser = new DOMParser();
-                            const kmlDoc = parser.parseFromString(kmlContent, "text/xml");
-                            const geojson = toGeoJSON.kml(kmlDoc);
-                            L.geoJSON(geojson).addTo(map);
-                            map.fitBounds(L.geoJSON(geojson).getBounds());
-                        });
+                        const kmlFile = zip.file(/\.kml$/i)[0];
+                        if (kmlFile) {
+                            kmlFile.async("string").then(kmlContent => {
+                                const parser = new DOMParser();
+                                const kmlDoc = parser.parseFromString(kmlContent, "text/xml");
+                                const geojson = toGeoJSON.kml(kmlDoc);
+                                const geoJsonLayer = L.geoJSON(geojson).addTo(map);
+                                map.fitBounds(geoJsonLayer.getBounds());
+                            });
+                        } else {
+                            console.error('No KML file found in the KMZ archive.');
+                        }
+                    }).catch(error => {
+                        console.error('Error reading KMZ file: ', error);
                     });
+                })
+                .catch(error => {
+                    console.error('Fetch error: ', error);
                 });
         };
 
-        // Replace 'YOUR_KMZ_FILE_URL' with the URL of your KMZ file on GitHub
         const kmzFileUrl = 'https://github.com/binh1986/dulieubando/raw/main/parcel_sel.kmz';
         loadKMZFromURL(kmzFileUrl);
 
@@ -62,14 +76,21 @@
             if (file && file.name.endsWith('.kmz')) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    JSZip.loadAsync(e.target.result).then(function(zip) {
-                        zip.file(/\.kml$/i)[0].async("string").then(function(kmlContent) {
-                            const parser = new DOMParser();
-                            const kmlDoc = parser.parseFromString(kmlContent, "text/xml");
-                            const geojson = toGeoJSON.kml(kmlDoc);
-                            L.geoJSON(geojson).addTo(map);
-                            map.fitBounds(L.geoJSON(geojson).getBounds());
-                        });
+                    JSZip.loadAsync(e.target.result).then(zip => {
+                        const kmlFile = zip.file(/\.kml$/i)[0];
+                        if (kmlFile) {
+                            kmlFile.async("string").then(kmlContent => {
+                                const parser = new DOMParser();
+                                const kmlDoc = parser.parseFromString(kmlContent, "text/xml");
+                                const geojson = toGeoJSON.kml(kmlDoc);
+                                const geoJsonLayer = L.geoJSON(geojson).addTo(map);
+                                map.fitBounds(geoJsonLayer.getBounds());
+                            });
+                        } else {
+                            alert('No KML file found in the KMZ archive.');
+                        }
+                    }).catch(error => {
+                        console.error('Error reading KMZ file: ', error);
                     });
                 };
                 reader.readAsArrayBuffer(file);
