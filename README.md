@@ -51,7 +51,7 @@
         };
 
         // Replace 'YOUR_KMZ_FILE_URL' with the URL of your KMZ file
-        const kmzFileUrl = 'https://drive.google.com/file/d/1K8RS6DVlL4iSf9yLlxEJnNCwIvy4VKoT/view?usp=sharing';
+        const kmzFileUrl = 'https://drive.google.com/uc?id=1K8RS6DVlL4iSf9yLlxEJnNCwIvy4VKoT';
         loadKMZFromURL(kmzFileUrl);
 
         document.getElementById('uploadForm').addEventListener('submit', function(event) {
