@@ -34,6 +34,26 @@
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
+        const loadKMZFromURL = (url) => {
+            fetch(url)
+                .then(response => response.arrayBuffer())
+                .then(data => {
+                    JSZip.loadAsync(data).then(zip => {
+                        zip.file(/\.kml$/i)[0].async("string").then(kmlContent => {
+                            const parser = new DOMParser();
+                            const kmlDoc = parser.parseFromString(kmlContent, "text/xml");
+                            const geojson = toGeoJSON.kml(kmlDoc);
+                            L.geoJSON(geojson).addTo(map);
+                            map.fitBounds(L.geoJSON(geojson).getBounds());
+                        });
+                    });
+                });
+        };
+
+        // Replace 'YOUR_KMZ_FILE_URL' with the URL of your KMZ file
+        const kmzFileUrl = 'https://drive.google.com/file/d/1K8RS6DVlL4iSf9yLlxEJnNCwIvy4VKoT/view?usp=sharing';
+        loadKMZFromURL(kmzFileUrl);
+
         document.getElementById('uploadForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const fileInput = document.getElementById('kmzFile');
@@ -60,4 +80,3 @@
     </script>
 </body>
 </html>
-
