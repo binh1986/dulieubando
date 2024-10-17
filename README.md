@@ -1,54 +1,65 @@
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/togeojson/0.16.0/togeojson.min.js"></script>
-<script src="https://unpkg.com/jszip@3.2.2/dist/jszip.min.js"></script>
-<script src="https://unpkg.com/leaflet-filelayer/leaflet.filelayer.js"></script>
-<script>
-    const map = L.map('map').setView([0, 0], 2);
-
-    // Thay thế lớp OpenStreetMap bằng lớp ESRI Satellite
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        maxZoom: 18,
-        attribution: '© Esri'
-    }).addTo(map);
-
-    document.getElementById('uploadForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const fileInput = document.getElementById('kmzFile');
-        const file = fileInput.files[0];
-        
-        if (file && file.name.endsWith('.kmz')) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                JSZip.loadAsync(e.target.result).then(function(zip) {
-                    const kmlFile = zip.file(/\.kml$/i)[0];
-                    if (kmlFile) {
-                        kmlFile.async("string").then(function(kmlContent) {
-                            const parser = new DOMParser();
-                            const kmlDoc = parser.parseFromString(kmlContent, "text/xml");
-                            const geojson = toGeoJSON.kml(kmlDoc);
-
-                            const geoJsonLayer = L.geoJSON(geojson, {
-                                onEachFeature: function (feature, layer) {
-                                    let popupContent = "<b>Details:</b><br>";
-                                    if (feature.properties) {
-                                        for (let key in feature.properties) {
-                                            popupContent += `${key}: ${feature.properties[key]}<br>`;
-                                        }
-                                    }
-                                    layer.bindPopup(popupContent);
-                                }
-                            }).addTo(map);
-
-                            map.fitBounds(geoJsonLayer.getBounds());
-                        });
-                    } else {
-                        alert('No KML file found in the KMZ archive.');
-                    }
-                });
-            };
-            reader.readAsArrayBuffer(file);
-        } else {
-            alert('Please upload a valid KMZ file.');
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="./resources/ol.css">
+        <link rel="stylesheet" href="resources/fontawesome-all.min.css">
+        <link rel="stylesheet" href="./resources/ol-layerswitcher.css">
+        <link rel="stylesheet" href="./resources/qgis2web.css">
+        <style>
+        html, body {
+            background-color: #ffffff;
         }
-    });
-</script>
+        .ol-control > * {
+            background-color: #f8f8f8!important;
+            color: #444444!important;
+            border-radius: 0px;
+        }
+        .ol-attribution a, .gcd-gl-input::placeholder, .search-layer-input-search::placeholder {
+            color: #444444!important;
+        }
+        .search-layer-input-search {
+            background-color: #f8f8f8!important;
+        }
+        .ol-control > *:focus, .ol-control >*:hover {
+            background-color: rgba(248, 248, 248, 0.7)!important;
+        } 
+        .ol-control {
+            background-color: rgba(255,255,255,.4) !important;
+            padding: 2px !important;
+        } 
+        </style>
+
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+            <div id="popup" class="ol-popup">
+                <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+                <div id="popup-content"></div>
+            </div>
+        </div>
+        <script src="resources/qgis2web_expressions.js"></script>
+        <script src="resources/polyfills.js"></script>
+        <script src="./resources/functions.js"></script>
+        <script src="./resources/ol.js"></script>
+        <script src="./resources/ol-layerswitcher.js"></script>
+        <script src="layers/parcel_sel2parcels_sel2_2.js"></script>
+        <script src="styles/parcel_sel2parcels_sel2_2_style.js"></script>
+        <script src="./layers/layers.js" type="text/javascript"></script> 
+        <script src="./resources/Autolinker.min.js"></script>
+        <script src="./resources/qgis2web.js"></script>
+    </body>
+</html>
