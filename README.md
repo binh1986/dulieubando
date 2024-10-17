@@ -3,18 +3,14 @@
 <script src="https://unpkg.com/jszip@3.2.2/dist/jszip.min.js"></script>
 <script src="https://unpkg.com/leaflet-filelayer/leaflet.filelayer.js"></script>
 <script>
-    const map = L.map('map', {
-        maxZoom: 21, // Đặt mức phóng to tối đa lên 21
-        zoomControl: true // Bật điều khiển zoom
-    }).setView([0, 0], 2);
+    const map = L.map('map').setView([0, 0], 2);
 
-    // Sử dụng lớp ảnh vệ tinh của ESRI với zoom tối đa
+    // Thay thế lớp OpenStreetMap bằng lớp ESRI Satellite
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        maxZoom: 21, // Đảm bảo lớp này cũng hỗ trợ mức zoom tối đa là 21
+        maxZoom: 18,
         attribution: '© Esri'
     }).addTo(map);
 
-    // Xử lý việc tải file KMZ và hiển thị lên bản đồ
     document.getElementById('uploadForm').addEventListener('submit', function(event) {
         event.preventDefault();
         const fileInput = document.getElementById('kmzFile');
